@@ -1,37 +1,52 @@
 # Instant Oracle XE server
-A [Docker](https://www.docker.com/) [image](https://registry.hub.docker.com/u/wscherphof/oracle-xe-11g-r2/) with [Oracle® Database Express Edition 11g Release 2 (11.2)](http://www.oracle.com/technetwork/database/database-technologies/express-edition/overview/index.html) running in [Oracle Linux 7](http://www.oracle.com/us/technologies/linux/overview/index.html)
+A [Dockerfile](https://www.docker.com/) with [Oracle® Database Express Edition 11g Release 2 (11.2)](http://www.oracle.com/technetwork/database/database-technologies/express-edition/overview/index.html) running in [Oracle Linux 7](http://www.oracle.com/us/technologies/linux/overview/index.html)
 - Default XE database on port 1521
 - Web management console on port 8080
 
-## Install
-1. [Install Docker](https://docs.docker.com/installation/#installation)
-1. `$ docker pull wscherphof/oracle-xe-11g-r2`
+## Build image
+
+Due to licensing issues you have to build the image by yourselves.
+
+1. [Install Docker](https://docs.docker.com/installation/#installation) or Docker Toolbox on Mac or Windows
+1. clone this repo
+1. build image using 
+
+````
+docker build --tag=ora-11g-xe:latest .
+````
 
 ## Run
 Create and run a container named db:
-```
-$ docker run -d -P --name db wscherphof/oracle-xe-11g-r2
-989f1b41b1f00c53576ab85e773b60f2458a75c108c12d4ac3d70be4e801b563
-```
+
+````
+$ docker run -d -P --name db ora-11g-xe
+````
 
 ## Connect
-The default password for both the `sys` and the `system` user is `manager`
-The XE database port `1521` is bound to the Docker host through `run -P`. To find the host's port:
-```
-$ docker port db 1521
-0.0.0.0:49189
-```
-So from the host, you can connect with `system/manager@localhost:49189`
-Though if using [Boot2Docker](https://github.com/boot2docker/boot2docker), you need the actual ip address instead of `localhost`:
-```
-$ boot2docker ip
+The default password for both the `sys` and the `system` user is `oracle`
+The XE database port `1521` and APEX port `8080` are bound to the Docker host through `run -P`. 
 
-The VM's Host only interface IP address is: 192.168.59.103
+To find the host's port:
 
-```
-If you're looking for a databse client, consider [sqlplus](http://www.oracle.com/technetwork/database/features/instant-client/index-100365.html)
-```
-$ sqlplus system/manager@192.168.59.103:49189
+````
+$ docker port db
+1521/tcp -> 0.0.0.0:32777
+8080/tcp -> 0.0.0.0:32776
+````
+
+So from the host, you can connect with `system/oracle@localhost:32777`
+
+If you are running [Docker Machine](https://github.com/boot2docker/boot2docker) (= your host OS is MacOS X or Windows), you need the actual ip address of VirtualBox VM instead of `localhost`:
+
+````
+$ docker-machine ip default
+192.168.99.100
+````
+
+If you're looking for a databse client, consider [sqlplus](http://www.oracle.com/technetwork/database/features/instant-client/index-100365.html) or Oracle's SQL Developer or SQLcl (http://www.oracle.com/technetwork/developer-tools/sql-developer/downloads/index.html) 
+
+````
+$ sqlplus system/oracle@192.168.99.100:32777
 
 SQL*Plus: Release 11.2.0.4.0 Production on Mon Sep 8 11:26:24 2014
 
@@ -42,7 +57,7 @@ Connected to:
 Oracle Database 11g Express Edition Release 11.2.0.2.0 - 64bit Production
 
 SQL> |
-```
+````
 
 ## Manage
 Find the host's port bound to the container's `8080` web console port:
