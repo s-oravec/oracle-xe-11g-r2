@@ -9,6 +9,7 @@ Due to licensing issues you have to build the image by yourselves.
 
 1. [Install Docker](https://docs.docker.com/installation/#installation) or Docker Toolbox on Mac or Windows
 1. clone this repo
+1. Edit `config/database/xe.rsp` to provide default port numbers & password
 1. build image using 
 
 ````
@@ -19,7 +20,7 @@ docker build --tag=ora-11g-xe:latest .
 Create and run a container named db:
 
 ````
-$ docker run -d -P --name db ora-11g-xe
+$ docker run -dP --name db ora11gxe
 ````
 
 ## Connect
@@ -39,14 +40,14 @@ So from the host, you can connect with `system/oracle@localhost:32777`
 If you are running [Docker Machine](https://github.com/boot2docker/boot2docker) (= your host OS is MacOS X or Windows), you need the actual ip address of VirtualBox VM instead of `localhost`:
 
 ````
-$ docker-machine ip default
+$ docker-machine ip $DOCKER_MACHINE_NAME
 192.168.99.100
 ````
 
 If you're looking for a databse client, consider [sqlplus](http://www.oracle.com/technetwork/database/features/instant-client/index-100365.html) or Oracle's SQL Developer or SQLcl (http://www.oracle.com/technetwork/developer-tools/sql-developer/downloads/index.html) 
 
 ````
-$ sqlplus system/oracle@192.168.99.100:32777
+$ sqlplus system/oracle@192.168.99.100:32777:XE
 
 SQL*Plus: Release 11.2.0.4.0 Production on Mon Sep 8 11:26:24 2014
 
@@ -63,11 +64,11 @@ SQL> |
 Find the host's port bound to the container's `8080` web console port:
 ```
 $ docker port db 8080
-0.0.0.0:49190
+0.0.0.0:32784
 ```
-Point a web browser to the `/apex` resource there - `http://192.168.59.103:49190/apex` (cannot use localhost here)
+Point a web browser to the `/apex` resource there - `http://192.168.99.100:32784/apex` (cannot use localhost here)
 
-Workspace=`INTERNAL`, Username=`ADMIN`, Password=`manager` (must change password after first login)
+Workspace=`INTERNAL`, Username=`ADMIN`, Password=`oracle` (must change password after first login)
 
 ![Web management console](https://github.com/wscherphof/oracle-xe-11g-r2/blob/master/apex.png)
 
@@ -109,18 +110,11 @@ The command completed successfully
 ```
 
 ## Enter
-There's no ssh deamon or similar configured in the image. If you need a command prompt inside the container, consider [docker-bash](https://github.com/phusion/baseimage-docker#docker_bash)
+There's no ssh deamon or similar configured in the image. If you need a command prompt inside the container connect using `docker exec`
+
+````
+$ docker exec -it db /bin/bash
+````
 
 ## License
 [GNU Lesser General Public License (LGPL)](http://www.gnu.org/licenses/lgpl-3.0.txt)
-
-## Build
-Should you want to modify & build your own image:
-
-1. Download & unzip the Oracle install package from [Oracle Tech Net](http://www.oracle.com/technetwork/database/database-technologies/express-edition/downloads/index.html); this will get you a `Disk1` folder
-1. Edit `Disk1/response/xe.rsp` to provide default port numbers & password
-1. `$ docker build -t <[user/]name[:tag]> .`
-
-## Credits
-Thanks to [Rob den Braber](http://blog.grid-it.nl/index.php/2014/05/16/installing-oracle-xe-in-a-docker-image/)
-
