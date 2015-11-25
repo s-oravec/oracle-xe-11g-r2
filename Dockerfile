@@ -1,5 +1,5 @@
 FROM wscherphof/oracle-linux-7
-MAINTAINER Wouter Scherphof <wouter.scherphof@gmail.com>
+MAINTAINER Štefan Oravec <stefan.oravec@me.com>
 
 # Install prerequisites
 RUN yum install -y make libaio bc net-tools vte3 unzip
@@ -21,6 +21,7 @@ ENV ORACLE_HOME /u01/app/oracle/product/11.2.0/xe
 ENV PATH        $ORACLE_HOME/bin:$PATH
 ENV ORACLE_SID  XE
 
+# Add to bashrc so you don't have to set it when you connect to container
 RUN echo 'export ORACLE_HOME=/u01/app/oracle/product/11.2.0/xe' >> /etc/bashrc && \
     echo 'export PATH=$ORACLE_HOME/bin:$PATH' >> /etc/bashrc && \
     echo 'export ORACLE_SID=XE' >> /etc/bashrc
