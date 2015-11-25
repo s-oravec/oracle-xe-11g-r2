@@ -1,10 +1,10 @@
 # Oracle 11gR2 XE
 
-(forked from [wscherphof/oracle-xe-11g-r2](https://github.com/wscherphof/oracle-xe-11g-r2)
+(forked from [wscherphof/oracle-xe-11g-r2](https://github.com/wscherphof/oracle-xe-11g-r2))
 
 A [Dockerfile](https://www.docker.com/) with [Oracle® Database Express Edition 11g Release 2 (11.2)](http://www.oracle.com/technetwork/database/database-technologies/express-edition/overview/index.html) running in [Oracle Linux 7](http://www.oracle.com/us/technologies/linux/overview/index.html)
 - Default XE database on port 1521
-- Web management console on port 8080
+- (Oracle APEX using PLSQL Gateway) Web management console on port 8080
 
 ## Build image
 
@@ -12,19 +12,21 @@ Due to licensing issues you have to build the image by yourselves.
 
 1. [Install Docker](https://docs.docker.com/installation/#installation) or Docker Toolbox on Mac or Windows
 1. clone this repo
-1. Edit `config/database/xe.rsp` to provide default port numbers & password
-1. build image using 
+1. Edit `config/database/xe.rsp` to change default port numbers & password
+1. build image using (or run `build_docker_image.sh` script)
 
 ````
 docker build --tag=ora-11g-xe:latest .
 ````
 
 ## Run
-Create and run a container named db:
+Run a container named `db`:
 
 ````
 $ docker run -dP --name db ora11gxe
 ````
+
+Or run `run_docker_container.sh`
 
 ## Connect
 The default password for both the `sys` and the `system` user is `oracle`
@@ -40,7 +42,7 @@ $ docker port db
 
 So from the host, you can connect with `system/oracle@localhost:32777`
 
-If you are running [Docker Machine](https://github.com/boot2docker/boot2docker) (= your host OS is MacOS X or Windows), you need the actual ip address of VirtualBox VM instead of `localhost`:
+If you are running [Docker Machine](https://docs.docker.com/machine/install-machine) (= your host OS is MacOS X or Windows), you need the actual ip address of VirtualBox VM instead of `localhost`:
 
 ````
 $ docker-machine ip $DOCKER_MACHINE_NAME
@@ -64,11 +66,13 @@ SQL> |
 ````
 
 ## Manage
+
 Find the host's port bound to the container's `8080` web console port:
 ```
 $ docker port db 8080
 0.0.0.0:32784
 ```
+
 Point a web browser to the `/apex` resource there - `http://192.168.99.100:32784/apex` (cannot use localhost here)
 
 Workspace=`INTERNAL`, Username=`ADMIN`, Password=`oracle` (must change password after first login)
@@ -76,7 +80,9 @@ Workspace=`INTERNAL`, Username=`ADMIN`, Password=`oracle` (must change password 
 ![Web management console](https://github.com/wscherphof/oracle-xe-11g-r2/blob/master/apex.png)
 
 ## Monitor
+
 The container runs a process that at the start sets the container's unique hostname in the Oracle configuration, starts up the database, and then continues to check each minute if the database is still running, and start it if it's not. To see the output of that process:
+
 ```
 $ docker logs db
 Tue Sep 9 14:54:42 UTC 2014
